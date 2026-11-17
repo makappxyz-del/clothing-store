@@ -3,8 +3,8 @@ import { CartProvider } from '../components/CartProvider';
 import Header from '../components/Header';
 
 export const metadata = {
-  title: 'THREADS — Everyday, elevated',
-  description: 'Thoughtful essentials and timeless clothing for every day.',
+  title: 'Lebaya — Style for every story',
+  description: 'Discover women’s dresses, western and traditional fashion, shoes, sunglasses, and accessories at Lebaya.',
 };
 
 export default function RootLayout({ children }) {
@@ -15,9 +15,9 @@ export default function RootLayout({ children }) {
           <Header />
           <main>{children}</main>
           <footer className="site-footer">
-            <a className="wordmark" href="/">THREADS<span>.</span></a>
-            <p>Made for the moments in between.</p>
-            <span>© 2026 THREADS. All rights reserved.</span>
+            <a className="wordmark lebaya-wordmark" href="/"><span className="brand-mark">L</span><span className="brand-name">Lebaya</span></a>
+            <p>Wear your story.</p>
+            <span>© 2026 Lebaya. All rights reserved.</span>
           </footer>
         </CartProvider>
       </body>

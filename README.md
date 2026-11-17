@@ -1,6 +1,6 @@
-# THREADS — Clothing store
+# Lebaya — fashion for every story
 
-A responsive clothing-shop storefront built with Next.js App Router and JavaScript. Includes a product collection, category filtering, search, product detail pages, a browser-persisted shopping bag, and a demo checkout flow.
+A responsive women’s fashion storefront built with Next.js App Router and JavaScript. Browse dresses, western and traditional styles, shoes, sunglasses, and accessories.
 
 ## Run locally
 
@@ -13,12 +13,16 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ## Features
 
-- Responsive storefront with featured collection and newsletter signup
-- Search and category filters
+- Lebaya brand identity and responsive storefront
+- Search and category filters across the collection
 - Product detail pages with size selection
 - Shopping bag stored in local storage, with quantity controls and removal
+- Profile dashboard with demo order history and a delivery-status timeline
 - Demo checkout confirmation (no payment processing)
-- Product photography served from Unsplash
+
+## Delivery tracking note
+
+Orders and their simulated tracking timeline are stored in the browser's local storage. This preview is not connected to a shipping carrier, backend, or authenticated user account. Real multi-device order history and live delivery tracking require a secure order API, customer authentication, and a shipping-carrier integration.
 
 ## Production build
 
@@ -27,4 +31,4 @@ npm run build
 npm start
 ```
 
-This is a front-end starter. To accept real orders, connect a secure payment provider and order-management backend; do not collect or store payment card details in the client.
+Product photos are loaded from Unsplash. Connect a secure payment provider and order-management backend before accepting real orders; never collect payment card data directly in the client.

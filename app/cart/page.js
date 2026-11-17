@@ -6,10 +6,30 @@ import { Minus, Plus, Trash2, ArrowRight, CheckCircle2 } from 'lucide-react';
 import { useCart } from '../../components/CartProvider';
 import { imageUrl } from '../../lib/products';
 
+const ORDERS_KEY = 'lebaya-orders-v1';
+
 export default function CartPage() {
   const { items, subtotal, updateQuantity, removeItem, clearCart } = useCart();
   const [orderPlaced, setOrderPlaced] = useState(false);
   const [email, setEmail] = useState('');
-  if (orderPlaced) return <section className="confirmation section-wrap"><CheckCircle2 size={48} /><p className="eyebrow">ORDER CONFIRMED</p><h1>Thanks for choosing better.</h1><p>A confirmation is on its way to {email}. This demo checkout doesn't process payments.</p><Link className="button" href="/#shop">Keep exploring <ArrowRight size={16} /></Link></section>;
-  return <section className="cart-page section-wrap"><p className="eyebrow">YOUR PICKS</p><h1>Your bag<span>.</span></h1>{items.length === 0 ? <div className="empty-cart"><p>Your bag is taking a little breather.</p><Link className="button" href="/#shop">Explore the collection <ArrowRight size={16} /></Link></div> : <div className="cart-layout"><div className="cart-items">{items.map((item) => <article className="cart-item" key={item.key}><Link href={`/products/${item.slug}`} className="cart-item-image"><img src={imageUrl(item.image, 400)} alt={item.name} /></Link><div className="cart-item-info"><Link href={`/products/${item.slug}`} className="product-name">{item.name}</Link><p>{item.color} · Size {item.size}</p><div className="quantity-control"><button aria-label="Decrease quantity" onClick={() => updateQuantity(item.key, item.quantity - 1)}><Minus size={14} /></button><span>{item.quantity}</span><button aria-label="Increase quantity" onClick={() => updateQuantity(item.key, item.quantity + 1)}><Plus size={14} /></button></div></div><div className="cart-item-end"><strong>${(item.price * item.quantity).toFixed(2)}</strong><button className="remove-button" aria-label={`Remove ${item.name}`} onClick={() => removeItem(item.key)}><Trash2 size={16} /></button></div></article>)}</div><aside className="order-summary"><h2>Order summary</h2><div className="summary-line"><span>Subtotal</span><span>${subtotal.toFixed(2)}</span></div><div className="summary-line"><span>Shipping</span><span>{subtotal >= 100 ? 'Free' : 'Calculated at checkout'}</span></div><p className="shipping-note">{subtotal >= 100 ? 'You unlocked free shipping!' : `You're $${Math.max(0, 100 - subtotal).toFixed(2)} away from free shipping.`}</p><div className="summary-total"><span>Total</span><strong>${subtotal.toFixed(2)}</strong></div><form onSubmit={(event) => { event.preventDefault(); clearCart(); setOrderPlaced(true); }} className="checkout-form"><label htmlFor="checkout-email">Email for your confirmation</label><input id="checkout-email" type="email" value={email} onChange={(event) => setEmail(event.target.value)} required placeholder="you@example.com" /><button className="button" type="submit">Continue to checkout <ArrowRight size={16} /></button><p className="demo-note">Demo checkout only — no payment is collected.</p></form></aside></div>}</section>;
+  const [orderNumber, setOrderNumber] = useState('');
+
+  function placeDemoOrder(event) {
+    event.preventDefault();
+    const id = `LB-${Date.now().toString().slice(-8)}`;
+    const order = { id, email, createdAt: new Date().toISOString(), items: items.map((item) => ({ ...item })), total: subtotal };
+    try {
+      const saved = JSON.parse(localStorage.getItem(ORDERS_KEY) || '[]');
+      localStorage.setItem(ORDERS_KEY, JSON.stringify([order, ...(Array.isArray(saved) ? saved : [])]));
+    } catch {
+      localStorage.setItem(ORDERS_KEY, JSON.stringify([order]));
+    }
+    setOrderNumber(id);
+    clearCart();
+    setOrderPlaced(true);
+  }
+
+  if (orderPlaced) return <section className="confirmation section-wrap"><CheckCircle2 size={48} /><p className="eyebrow">ORDER CONFIRMED</p><h1>Thanks for choosing Lebaya.</h1><p>Demo order <strong>{orderNumber}</strong> is saved in this browser. Check its delivery timeline in your profile dashboard.</p><Link className="button" href="/profile">Track your order <ArrowRight size={16} /></Link></section>;
+
+  return <section className="cart-page section-wrap"><p className="eyebrow">YOUR PICKS</p><h1>Your bag<span>.</span></h1>{items.length === 0 ? <div className="empty-cart"><p>Your bag is taking a little breather.</p><Link className="button" href="/#shop">Explore the collection <ArrowRight size={16} /></Link></div> : <div className="cart-layout"><div className="cart-items">{items.map((item) => <article className="cart-item" key={item.key}><Link href={`/products/${item.slug}`} className="cart-item-image"><img src={imageUrl(item.image, 400)} alt={item.name} /></Link><div className="cart-item-info"><Link href={`/products/${item.slug}`} className="product-name">{item.name}</Link><p>{item.color} · Size {item.size}</p><div className="quantity-control"><button aria-label="Decrease quantity" onClick={() => updateQuantity(item.key, item.quantity - 1)}><Minus size={14} /></button><span>{item.quantity}</span><button aria-label="Increase quantity" onClick={() => updateQuantity(item.key, item.quantity + 1)}><Plus size={14} /></button></div></div><div className="cart-item-end"><strong>${(item.price * item.quantity).toFixed(2)}</strong><button className="remove-button" aria-label={`Remove ${item.name}`} onClick={() => removeItem(item.key)}><Trash2 size={16} /></button></div></article>)}</div><aside className="order-summary"><h2>Order summary</h2><div className="summary-line"><span>Subtotal</span><span>${subtotal.toFixed(2)}</span></div><div className="summary-line"><span>Shipping</span><span>{subtotal >= 100 ? 'Free' : 'Calculated at checkout'}</span></div><p className="shipping-note">{subtotal >= 100 ? 'You unlocked free shipping!' : `You're $${Math.max(0, 100 - subtotal).toFixed(2)} away from free shipping.`}</p><div className="summary-total"><span>Total</span><strong>${subtotal.toFixed(2)}</strong></div><form onSubmit={placeDemoOrder} className="checkout-form"><label htmlFor="checkout-email">Email for your confirmation</label><input id="checkout-email" type="email" value={email} onChange={(event) => setEmail(event.target.value)} required placeholder="you@example.com" /><button className="button" type="submit">Place demo order <ArrowRight size={16} /></button><p className="demo-note">Demo checkout only — no payment is collected.</p></form></aside></div>}</section>;
 }
