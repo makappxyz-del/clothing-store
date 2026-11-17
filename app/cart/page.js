@@ -1,24 +1,38 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Minus, Plus, Trash2, ArrowRight, CheckCircle2 } from 'lucide-react';
 import { useCart } from '../../components/CartProvider';
 import { imageUrl } from '../../lib/products';
 import { formatPrice } from '../../lib/currency';
+import { getCurrentUser } from '../../lib/auth';
 
 const ORDERS_KEY = 'lebaya-orders-v1';
 
 export default function CartPage() {
   const { items, subtotal, updateQuantity, removeItem, clearCart } = useCart();
   const [orderPlaced, setOrderPlaced] = useState(false);
-  const [email, setEmail] = useState('');
   const [orderNumber, setOrderNumber] = useState('');
+  const [user, setUser] = useState(null);
+  const [authReady, setAuthReady] = useState(false);
+  const router = useRouter();
+
+  useEffect(() => {
+    setUser(getCurrentUser());
+    setAuthReady(true);
+  }, []);
 
   function placeDemoOrder(event) {
     event.preventDefault();
+    const currentUser = getCurrentUser();
+    if (!currentUser) {
+      router.push('/login?next=%2Fcart');
+      return;
+    }
     const id = `LB-${Date.now().toString().slice(-8)}`;
-    const order = { id, email, createdAt: new Date().toISOString(), items: items.map((item) => ({ ...item })), total: subtotal };
+    const order = { id, email: currentUser.email, createdAt: new Date().toISOString(), items: items.map((item) => ({ ...item })), total: subtotal };
     try {
       const saved = JSON.parse(localStorage.getItem(ORDERS_KEY) || '[]');
       localStorage.setItem(ORDERS_KEY, JSON.stringify([order, ...(Array.isArray(saved) ? saved : [])]));
@@ -44,7 +58,10 @@ export default function CartPage() {
               <div className="cart-item-end"><strong>{formatPrice(item.price * item.quantity)}</strong><button type="button" aria-label={`Remove ${item.name}`} onClick={() => removeItem(item.key)}><Trash2 size={17} /></button></div>
             </article>
           ))}</div>
-          <aside className="cart-summary"><h2>Order summary</h2><p>Subtotal <strong>{formatPrice(subtotal)}</strong></p><p>Delivery <span>Calculated at checkout</span></p><form onSubmit={placeDemoOrder}><label htmlFor="checkout-email">Email address</label><input id="checkout-email" type="email" value={email} onChange={(event) => setEmail(event.target.value)} required placeholder="you@example.com" /><button className="button" type="submit">Place demo order <ArrowRight size={16} /></button></form><small>All prices are shown in Bangladeshi taka (BDT).</small></aside>
+          <aside className="cart-summary"><h2>Order summary</h2><p>Subtotal <strong>{formatPrice(subtotal)}</strong></p><p>Delivery <span>Calculated at checkout</span></p>
+            {!authReady ? <p>Checking your account…</p> : user ? <form onSubmit={placeDemoOrder}><p>Ordering as <strong>{user.email}</strong></p><button className="button" type="submit">Place demo order <ArrowRight size={16} /></button></form> : <div><p>Please log in or create an account before placing your order.</p><Link className="button" href="/login?next=%2Fcart">Log in to order <ArrowRight size={16} /></Link><p style={{ marginTop: 14 }}>New here? <Link className="text-link" href="/signup?next=%2Fcart">Create an account</Link></p></div>}
+            <small>All prices are shown in Bangladeshi taka (BDT).</small>
+          </aside>
         </div>
       )}
     </section>

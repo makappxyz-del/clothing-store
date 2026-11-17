@@ -1,6 +1,7 @@
 import './globals.css';
 import { CartProvider } from '../components/CartProvider';
 import Header from '../components/Header';
+import HeritageBrands from '../components/HeritageBrands';
 
 export const metadata = {
   title: 'Lebaya — Style for every story',
@@ -14,6 +15,7 @@ export default function RootLayout({ children }) {
         <CartProvider>
           <Header />
           <main>{children}</main>
+          <HeritageBrands />
           <footer className="site-footer">
             <div className="footer-brand">
               <a className="wordmark lebaya-wordmark" href="/"><span className="brand-mark">L</span><span className="brand-name">Lebaya</span></a>
@@ -29,6 +31,7 @@ export default function RootLayout({ children }) {
               <a href="/privacy-policy">Privacy Policy</a>
               <a href="/terms-and-conditions">Terms &amp; Conditions</a>
             </nav>
+            <div className="footer-social"><a href="https://www.facebook.com/share/18YDAzCKc3/" target="_blank" rel="noreferrer" aria-label="Lebaya on Facebook">Facebook ↗</a></div>
             <span className="footer-copyright">© 2026 Lebaya. All rights reserved.</span>
           </footer>
         </CartProvider>
